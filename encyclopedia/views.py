@@ -7,15 +7,15 @@ import random
 class NewPageForm(forms.Form):
        title = forms.CharField(max_length = 100, label="Title")
        content = forms.CharField(widget=forms.Textarea)
-
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })
 
 def detail(request,title):
-            title = util.get_entry(title)
-            context = {"title":title}
+            content = util.get_entry(title)
+            context = {"content":content,
+                       "title":title}
             return render(request,"detail/detail.html",context)
 def search(request):
      if request.method == "GET":
@@ -38,5 +38,12 @@ def new_page(request):
 def random_page(request):
        entry = random.choice(util.list_entries())
        content = util.get_entry(entry)
-       context = {"title":content}
+       context = {"content":content,
+                  "title":entry}
        return render(request,"detail/detail.html",context)
+
+def edit_page(request,title):
+       #open the page and get it ready for edit
+       page_content= util.get_entry(title)
+       form = NewPageForm(initial={"title":title,"content":page_content})
+       return render(request,"encyclopedia/edit.html",{"edit_form":form})
